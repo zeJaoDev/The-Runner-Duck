@@ -10,7 +10,7 @@ public class mapLoading : MonoBehaviour
 
    
     private float height;
-    private float loadingSpeed = -2f;
+    private float loadingSpeed = -3f;
 
 
     void Start()
@@ -32,7 +32,7 @@ public class mapLoading : MonoBehaviour
      if (transform.position.y < -height)
         {
 
-         Vector2 resetPosition = new Vector2(height * 0, 2f);
+         Vector2 resetPosition = new Vector2(height * 0, 5f);
          transform.position = (Vector2)transform.position + resetPosition;
 
         }

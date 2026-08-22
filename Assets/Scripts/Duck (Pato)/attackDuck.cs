@@ -1,16 +1,32 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class attackCharacters : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    [Range(1, 10)]
+    [SerializeField] private float speed = 10f;
+
+    [Range(1, 10)]
+    [SerializeField] private float lifetime = 3f;
+
+    private Rigidbody2D rb;
+
     void Start()
     {
         
+     rb = GetComponent<Rigidbody2D>();
+     Destroy(gameObject, lifetime);
+
+   
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
         
+     rb.linearVelocity = transform.up * speed;
+
     }
+
 }
