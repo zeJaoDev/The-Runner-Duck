@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::attackCharacters
   speed: 10
-  lifetime: 3
+  lifetime: 1
 --- !u!50 &-8838948693025848585
 Rigidbody2D:
   serializedVersion: 5
