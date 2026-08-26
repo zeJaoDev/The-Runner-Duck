@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class attackCharacters : MonoBehaviour
 {
@@ -27,6 +27,17 @@ public class attackCharacters : MonoBehaviour
         
      rb.linearVelocity = transform.up * speed;
 
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        enemyGeral enemy = other.GetComponent<enemyGeral>();
+
+        if (enemy != null)
+        {
+            enemy.ReceberDano();
+            Destroy(gameObject);
+        }
     }
 
 }
