@@ -15,11 +15,9 @@ public class enemyGeral : MonoBehaviour
     [SerializeField]
     private BarraVida barraVida;
 
-public float verticalSpeed;
+    public Transform player;
+    public float horizontalSpeed = 3f;
 
-public Transform player;
-public float horizontalSpeed = 3f;
-public GameObject gameOverPanel;
 void Start()
 {
   player = GameObject.FindGameObjectWithTag("Duck").transform;
@@ -63,19 +61,21 @@ private void OnCollisionEnter2D(Collision2D collision)
 {
   if (collision.gameObject.CompareTag("Duck"))
 {
-  gameOverPanel.SetActive(true);
+  PlayerLife playerLife =  collision.gameObject.GetComponent<PlayerLife>();
 
-  PlayerMove movement = collision.gameObject.GetComponent<PlayerMove>();
-
-  if (movement != null)
+  if (playerLife != null)
 {
-  movement.enabled = false;
+     playerLife.Morrer();
+}
+}
+
+  if (collision.gameObject.CompareTag("Enemy"))
+{
+  Object.Destroy(gameObject);
 }
 
 }
-
-}
-private void Mover() 
+ private void Mover() 
 { 
 
 }
