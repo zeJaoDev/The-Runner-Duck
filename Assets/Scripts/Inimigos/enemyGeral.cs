@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 public class enemyGeral : MonoBehaviour
@@ -61,11 +60,11 @@ private void OnCollisionEnter2D(Collision2D collision)
 {
   if (collision.gameObject.CompareTag("Duck"))
 {
-            PlayerLife playerLife = collision.gameObject.GetComponent<PlayerLife>();
+            PlayerMove duck = collision.gameObject.GetComponent<PlayerMove>();
 
-  if (playerLife != null)
+  if (duck != null)
 {
-  playerLife.Morrer();
+  duck.Morrer();
 }
 }
 

@@ -6,11 +6,11 @@ private void OnTriggerEnter2D(Collider2D collision)
 {
   if (collision.CompareTag("Duck"))
 {
-  collision.GetComponent<moveDuck>();
+  PlayerMove duck = collision.GetComponent<PlayerMove>();
 
-  if (player != null)
+  if (duck != null)
 {
-  player.Stuck();
+  duck.Stuck();
 }
   Destroy(gameObject);
 }

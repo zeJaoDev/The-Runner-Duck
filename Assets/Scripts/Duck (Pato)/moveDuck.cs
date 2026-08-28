@@ -19,6 +19,7 @@ public float playerJumpHeight = 10f;
 
   [SerializeField] private GameObject shotWaterPrefab;
   [SerializeField] private Transform firingPoint;
+  
   // [Range(0.1f, 1f)]
   // [SerializeField] private float fireRate = 0.5f;
 
@@ -50,7 +51,7 @@ public void Morrer()
 
   if (sprite != null)
 {
-            sprite.enabled = false;
+  sprite.enabled = false;
 }
   BarraVida[] barras = FindObjectsByType<BarraVida>(FindObjectsSortMode.None);
 
@@ -69,69 +70,60 @@ public void Stuck()
 
 
 
-    private void OnEnable()
+private void OnEnable()
 {
-        playerControls.Enable();
-        playerJump.Enable();
-        playerJump.performed += DoJump;
-    }
+  playerControls.Enable();
+  playerJump.Enable();
+  playerJump.performed += DoJump;
+}
 private void OnDisable()
-    {
-        playerControls.Disable();
-        playerJump.Disable();
-    }
-void Start()
-    {
-
-    }
-    void Update()
-    {
-        playerDirection = playerControls.ReadValue<Vector2>();
-        playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerPhysics.linearVelocity.y);
-
-        if (Input.GetMouseButtonDown(0))
-        {
-
-            Shoot();
-
-        }
-
-        {
-            if (stuck)
-            {
-                if (Input.GetKeyDown(KeyCode.W))
-                {
-                    sequenceDash++;
-
-                    if (sequenceDash >= 5)
-                    {
-                        stuck = false;
-                        sequenceDash = 0;
-                    }
-                }
-                return;
-            }
-
-        }
-    }
-
-public void DoJump(InputAction.CallbackContext context)
-    {
-        playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerJumpHeight);
-    }
-
-private void FixedUpdate() 
-    
-    { 
-    
-    }
-    
-private void Shoot() 
-    
 {
-
-        Instantiate(shotWaterPrefab, firingPoint.position, firingPoint.rotation);
+  playerControls.Disable();
+  playerJump.Disable();
+}
+void Start()
+{
 
 }
-    
+void Update()
+{
+  playerDirection = playerControls.ReadValue<Vector2>();
+  playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerPhysics.linearVelocity.y);
+
+  if (Input.GetMouseButtonDown(0))
+{
+
+  Shoot();
+
+}
+
+{ if (stuck)
+{
+   if (Input.GetKeyDown(KeyCode.W))
+{
+   sequenceDash++;
+
+   if (sequenceDash >= 5)
+{
+   stuck = false;
+   sequenceDash = 0;
+}
+}
+   return;
+}
+}
+}
+
+public void DoJump(InputAction.CallbackContext context)
+{
+   playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerJumpHeight);
+}
+private void FixedUpdate() 
+{ 
+
+}
+private void Shoot()  
+{
+   Instantiate(shotWaterPrefab, firingPoint.position, firingPoint.rotation);
+}
 }

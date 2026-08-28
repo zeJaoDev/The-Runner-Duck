@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7352339901648189177}
   - component: {fileID: 5472845698049423864}
   - component: {fileID: 6844087928706268397}
+  - component: {fileID: 226530899260047468}
   m_Layer: 0
   m_Name: SandTrap
   m_TagString: Trap
@@ -145,3 +146,15 @@ PolygonCollider2D:
       - {x: 0.43359375, y: 0.25}
       - {x: 0, y: 0.5}
   m_UseDelaunayMesh: 1
+--- !u!114 &226530899260047468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5987031625887096940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a22bc453f5dcb94ebb0f90b2fa32aad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::sandTrap

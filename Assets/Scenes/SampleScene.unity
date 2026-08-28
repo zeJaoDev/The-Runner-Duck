@@ -769,7 +769,7 @@ MonoBehaviour:
   playerJumpHeight: 10
   shotWaterPrefab: {fileID: 5038414910696749620, guid: 710b08e127c4b1648b51389a0836a3df, type: 3}
   firingPoint: {fileID: 64896347}
-  gameOverPanel: {fileID: 0}
+  gameOverPanel: {fileID: 880351194}
   BarraVida: {fileID: 0}
 --- !u!114 &982894042
 MonoBehaviour:
@@ -783,8 +783,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bec629174e418e4d996514b73713823, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLife
-  gameOverPanel: {fileID: 880351194}
-  BarraVida: {fileID: 0}
 --- !u!1 &1115881456
 GameObject:
   m_ObjectHideFlags: 0
