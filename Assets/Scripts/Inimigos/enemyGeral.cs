@@ -61,21 +61,21 @@ private void OnCollisionEnter2D(Collision2D collision)
 {
   if (collision.gameObject.CompareTag("Duck"))
 {
-  PlayerLife playerLife =  collision.gameObject.GetComponent<PlayerLife>();
+            PlayerLife playerLife = collision.gameObject.GetComponent<PlayerLife>();
 
   if (playerLife != null)
 {
-     playerLife.Morrer();
+  playerLife.Morrer();
 }
 }
 
   if (collision.gameObject.CompareTag("Enemy"))
 {
-  Object.Destroy(gameObject);
+    Destroy(gameObject);
+}
 }
 
-}
- private void Mover() 
+private void Mover() 
 { 
 
 }

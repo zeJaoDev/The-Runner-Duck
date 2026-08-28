@@ -769,6 +769,8 @@ MonoBehaviour:
   playerJumpHeight: 10
   shotWaterPrefab: {fileID: 5038414910696749620, guid: 710b08e127c4b1648b51389a0836a3df, type: 3}
   firingPoint: {fileID: 64896347}
+  gameOverPanel: {fileID: 0}
+  BarraVida: {fileID: 0}
 --- !u!114 &982894042
 MonoBehaviour:
   m_ObjectHideFlags: 0
