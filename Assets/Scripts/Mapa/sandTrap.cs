@@ -2,17 +2,16 @@ using UnityEngine;
 
 public class sandTrap : MonoBehaviour
 {
-private void OnTriggerEnter2D(Collider2D collision)
-{
-  if (collision.CompareTag("Duck"))
-{
-  PlayerMove duck = collision.GetComponent<PlayerMove>();
+    [SerializeField]
+    private float velocidade = 4f;
 
-  if (duck != null)
-{
-  duck.Stuck();
-}
-  Destroy(gameObject);
-}
-}
+    private void Update()
+    {
+        transform.Translate(Vector2.down * velocidade * Time.deltaTime);
+
+        if (transform.position.y < -6f)
+        {
+            Destroy(gameObject);
+        }
+    }
 }

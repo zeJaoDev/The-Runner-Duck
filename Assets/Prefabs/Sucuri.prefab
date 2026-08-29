@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ec706ddfe704c3428a1b46b3d3bd6c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemyGeral
-  vida: 10
+  vida: 5
   barraVida: {fileID: 7054379697246735614}
   player: {fileID: 0}
   horizontalSpeed: 6

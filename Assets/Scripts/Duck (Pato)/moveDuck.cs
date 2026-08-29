@@ -27,8 +27,6 @@ public float playerJumpHeight = 10f;
   [SerializeField] private GameObject BarraVida;
 
 private bool dead = false;
-private bool stuck = false;
-private int sequenceDash;
 
 public void Morrer()
 {
@@ -62,13 +60,6 @@ public void Morrer()
   Time.timeScale = 0f;
 }
 
-public void Stuck()
-{
-  stuck = true;
-  sequenceDash = 0;
-}
-
-
 
 private void OnEnable()
 {
@@ -96,23 +87,8 @@ void Update()
   Shoot();
 
 }
+}
 
-{ if (stuck)
-{
-   if (Input.GetKeyDown(KeyCode.W))
-{
-   sequenceDash++;
-
-   if (sequenceDash >= 5)
-{
-   stuck = false;
-   sequenceDash = 0;
-}
-}
-   return;
-}
-}
-}
 
 public void DoJump(InputAction.CallbackContext context)
 {
