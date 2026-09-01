@@ -1,17 +1,24 @@
 using UnityEngine;
 
-public class spawnerTrap : MonoBehaviour
+public class TrapSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject sandTrapPrefab;
+    [SerializeField]
+    private GameObject sandTrapPrefab;
 
-    [SerializeField] private float minX = -4f;
-    [SerializeField] private float maxX = 4f;
+    [SerializeField]
+    private float minX = -4f;
 
-    [SerializeField] private float spawnY = 6f;
+    [SerializeField]
+    private float maxX = 4f;
 
-    [SerializeField] private float intervaloSpawn = 2f;
+    [SerializeField]
+    private float spawnY = 6f;
 
-    [SerializeField] private float distanciaMinima = 2.5f;
+    [SerializeField]
+    private float intervaloSpawn = 2f;
+
+    [SerializeField]
+    private float distanciaMinima = 2.5f;
 
     private void Start()
     {
@@ -38,11 +45,8 @@ public class spawnerTrap : MonoBehaviour
         {
             novaPosicaoX = Random.Range(minX, maxX);
             tentativas++;
-
-            if (tentativas > 20)
-                break;
-
-        } while (!PosicaoValida(novaPosicaoX));
+        }
+        while (!PosicaoValida(novaPosicaoX) && tentativas < 20);
 
         return novaPosicaoX;
     }
@@ -53,10 +57,11 @@ public class spawnerTrap : MonoBehaviour
 
         foreach (GameObject trap in traps)
         {
-            if (Mathf.Abs(trap.transform.position.x - posX) < distanciaMinima)
-            {
+            float distancia =
+                Mathf.Abs(trap.transform.position.x - posX);
+
+            if (distancia < distanciaMinima)
                 return false;
-            }
         }
 
         return true;

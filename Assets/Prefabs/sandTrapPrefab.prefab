@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 6844087928706268397}
   - component: {fileID: 226530899260047468}
   - component: {fileID: -6075029685807362946}
+  - component: {fileID: 6768245559347468563}
+  - component: {fileID: 5841975316737419674}
   m_Layer: 0
   m_Name: sandTrapPrefab
   m_TagString: Trap
@@ -30,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.63, y: 2.38696, z: 0}
-  m_LocalScale: {x: 3, y: 2, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -84,8 +86,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2135585597343286014, guid: 5aa8b770bc43046bc8d993d0d5b7f4a5, type: 3}
-  m_Color: {r: 0.5943396, g: 0.39666808, b: 0.2270826, a: 1}
+  m_Sprite: {fileID: 5992120007463736870, guid: f9344417b76b8e44da101c45e387c8a8, type: 3}
+  m_Color: {r: 0.64435744, g: 0.754717, b: 0.72367835, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -132,7 +134,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.8828125, y: 1}
+    oldSize: {x: 1.24, y: 1.16}
     newSize: {x: 0.8828125, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -168,7 +170,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5987031625887096940}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -187,3 +189,32 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &6768245559347468563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5987031625887096940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a22bc453f5dcb94ebb0f90b2fa32aad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::sandTrap
+  velocidade: 4
+--- !u!114 &5841975316737419674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5987031625887096940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fbc774de933a2744adea3a8e042acf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrapStick
+  playerTag: Duck
+  holdForever: 1
+  holdSeconds: 0
+  parentToTrap: 1

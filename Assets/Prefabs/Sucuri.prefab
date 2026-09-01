@@ -188,7 +188,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ec706ddfe704c3428a1b46b3d3bd6c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemyGeral
-  vida: 5
+  vida: 12
   barraVida: {fileID: 7054379697246735614}
   player: {fileID: 0}
   horizontalSpeed: 6
@@ -301,7 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 809cf52d14492884daf7e3f74c1d4833, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFollow
-  speed: 1.2
+  speed: 1.5
 --- !u!1 &4143073475236670298
 GameObject:
   m_ObjectHideFlags: 0

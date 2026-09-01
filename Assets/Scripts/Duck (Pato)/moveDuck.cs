@@ -1,105 +1,123 @@
 using System.Runtime.CompilerServices;
+
 using UnityEngine;
+
 using UnityEngine.InputSystem;
+
 using System.Collections;
+
 using System.Collections.Generic;
+
 using Unity.VisualScripting;
 
 public class PlayerMove : MonoBehaviour
+
 {
 
-public InputAction playerControls;
-public float playerSpeed = 8f;
+    public InputAction playerControls;
 
-  Vector2 playerDirection;
+    public float playerSpeed = 8f;
 
-public Rigidbody2D playerPhysics;
-public InputAction playerJump;
-public float playerJumpHeight = 10f;
+    Vector2 playerDirection;
 
-  [SerializeField] private GameObject shotWaterPrefab;
-  [SerializeField] private Transform firingPoint;
-  
-  // [Range(0.1f, 1f)]
-  // [SerializeField] private float fireRate = 0.5f;
+    public Rigidbody2D playerPhysics;
+    public InputAction playerJump;
+    public float playerJumpHeight = 10f;
 
-  [SerializeField] private GameObject gameOverPanel;
-  [SerializeField] private GameObject BarraVida;
+    [SerializeField] private GameObject shotWaterPrefab;
+    [SerializeField] private Transform firingPoint;
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject BarraVida;
 
-private bool dead = false;
+    private bool dead = false;
 
-public void Morrer()
-{
-  if (dead) return;
+    // Freeze state
+    public bool IsFrozen { get; private set; }
 
-  dead = true;
+    public void Morrer()
+    {
+        if (dead) return;
 
-  // Mostra tela de Game Over
-  gameOverPanel.SetActive(true);
+        dead = true;
+        gameOverPanel.SetActive(true);
 
-  // Para movimento
-  PlayerMove movement = GetComponent<PlayerMove>();
+        // Para movimento
+        enabled = false;
 
-  if (movement != null)
-{
-  movement.enabled = false;
-}
-  // Esconde o sprite do jogador
-  SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+        // Esconde o sprite do jogador
+        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) sprite.enabled = false;
 
-  if (sprite != null)
-{
-  sprite.enabled = false;
-}
-  BarraVida[] barras = FindObjectsByType<BarraVida>(FindObjectsSortMode.None);
+        BarraVida[] barras = FindObjectsByType<BarraVida>(FindObjectsSortMode.None);
+        foreach (BarraVida barra in barras) barra.gameObject.SetActive(false);
 
-  foreach (BarraVida barra in barras)
-{
-  barra.gameObject.SetActive(false);
-}
-  Time.timeScale = 0f;
-}
+        Time.timeScale = 0f;
+    }
 
+    public void Freeze()
+    {
+        if (IsFrozen) return;
+        IsFrozen = true;
 
-private void OnEnable()
-{
-  playerControls.Enable();
-  playerJump.Enable();
-  playerJump.performed += DoJump;
-}
-private void OnDisable()
-{
-  playerControls.Disable();
-  playerJump.Disable();
-}
-void Start()
-{
+        if (playerPhysics != null)
+        {
+            playerPhysics.linearVelocity = Vector2.zero;
+            playerPhysics.angularVelocity = 0f;
+            playerPhysics.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
 
-}
-void Update()
-{
-  playerDirection = playerControls.ReadValue<Vector2>();
-  playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerPhysics.linearVelocity.y);
+        enabled = false;
+    }
 
-  if (Input.GetMouseButtonDown(0))
-{
+    public void Unfreeze()
+    {
+        if (!IsFrozen) return;
+        IsFrozen = false;
 
-  Shoot();
+        if (playerPhysics != null)
+        {
+            playerPhysics.constraints = RigidbodyConstraints2D.None;
+        }
 
-}
-}
+        enabled = true;
+    }
 
+    private void OnEnable()
+    {
+        playerControls.Enable();
+        playerJump.Enable();
+        playerJump.performed += DoJump;
+    }
+    private void OnDisable()
+    {
+        playerControls.Disable();
+        playerJump.Disable();
+    }
 
-public void DoJump(InputAction.CallbackContext context)
-{
-   playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerJumpHeight);
-}
-private void FixedUpdate() 
-{ 
+    void Start() { }
 
-}
-private void Shoot()  
-{
-   Instantiate(shotWaterPrefab, firingPoint.position, firingPoint.rotation);
-}
+    void Update()
+    {
+        if (IsFrozen) return;
+
+        playerDirection = playerControls.ReadValue<Vector2>();
+       
+        playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerPhysics.linearVelocity.y);
+
+        if (Input.GetMouseButtonDown(0)) Shoot();
+    }
+
+    public void DoJump(InputAction.CallbackContext context)
+    {
+        if (IsFrozen) return;
+        playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerJumpHeight);
+    }
+
+    private void FixedUpdate() { }
+
+    private void Shoot()
+    {
+        Instantiate(shotWaterPrefab, firingPoint.position, firingPoint.rotation);
+    }
+
 }
