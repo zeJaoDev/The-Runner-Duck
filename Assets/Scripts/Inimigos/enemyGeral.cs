@@ -1,82 +1,123 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class enemyGeral : MonoBehaviour
 {
+    [Header("Vida")]
+    [SerializeField] private int vida;
+    [SerializeField] private BarraVida barraVida;
 
-    [SerializeField]
-    private int vida;
+    [Header("Game Over")]
+    [SerializeField] private GameObject gameOverPanel;
 
-  // [SerializeField]
-  // private Animator animator;
-    
-    [SerializeField]
-    private BarraVida barraVida;
-
+    [Header("Movimentação")]
     public Transform player;
     public float horizontalSpeed = 3f;
 
-void Start()
-{
-  player = GameObject.FindGameObjectWithTag("Duck").transform;
+    private void Start()
+    {
+        if (player == null)
+        {
+            GameObject duck =
+                GameObject.FindGameObjectWithTag("Duck");
 
-  this.barraVida.VidaMax = this.vida;
-  this.barraVida.Vida = this.vida;
-}
-void Update()
-{
-  if (this.vida > 0)
-{
-  Mover();
-}
+            if (duck != null)
+            {
+                player = duck.transform;
+            }
+            else
+            {
+                enabled = false;
+            }
+        }
 
-  transform.position = new Vector2(Mathf.MoveTowards (transform.position.x, player.transform.position.x, horizontalSpeed * Time.deltaTime) ,transform.position.y);
-}
+        if (barraVida != null)
+        {
+            barraVida.VidaMax = vida;
+            barraVida.Vida = vida;
+        }
+    }
 
-public void ReceberDano()
-{
-  if (this.vida > 0) 
-{ 
+    private void Update()
+    {
+        if (player == null)
+        {
+            enabled = false;
+            return;
+        }
 
-  this.vida--;
-  this.barraVida.Vida = this.vida;
+        if (vida > 0)
+        {
+            Mover();
+        }
+    }
 
-  if(this.vida <= 0)
-{
-  Destroy(gameObject);
-  // this.animator.SetBool("eliminado", true);
-}
-  else 
-{
-  //this.animator.SetTrigger("recebendoDano");        
-}
+    public void ReceberDano()
+    {
+        if (vida <= 0) return;
 
-}
+        vida--;
 
-}
+        if (barraVida != null)
+        {
+            barraVida.Vida = vida;
+        }
 
-private void OnCollisionEnter2D(Collision2D collision)
-{
-  if (collision.gameObject.CompareTag("Duck"))
-{
-            PlayerMove duck = collision.gameObject.GetComponent<PlayerMove>();
+        if (vida <= 0)
+        {
+            Destroy(gameObject);
 
-  if (duck != null)
-{
-  duck.Morrer();
-}
-}
+            // Quando adicionar animação:
+            // animator.SetBool("eliminado", true);
+        }
+        else
+        {
+            // Quando adicionar animação:
+            // animator.SetTrigger("recebendoDano");
+        }
+    }
 
-  if (collision.gameObject.CompareTag("Enemy"))
-{
-    Destroy(gameObject);
-}
-}
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Duck"))
+        {
+            PlayerMove duck =
+                collision.gameObject.GetComponentInParent<PlayerMove>();
 
-private void Mover() 
-{ 
+            if (duck != null)
+            {
+                // O próprio Morrer() mostra o painel e pausa o jogo.
+                duck.Morrer();
+            }
+            else if (gameOverPanel != null)
+            {
+                // Segurança caso o PlayerMove não seja encontrado.
+                gameOverPanel.SetActive(true);
+            }
 
-}
+            // O inimigo para de perseguir o jogador.
+            enabled = false;
+            return;
+        }
 
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Mover()
+    {
+        if (player == null) return;
+
+        float novaPosicaoX = Mathf.MoveTowards(
+            transform.position.x,
+            player.position.x,
+            horizontalSpeed * Time.deltaTime
+        );
+
+        transform.position = new Vector2(
+            novaPosicaoX,
+            transform.position.y
+        );
+    }
 }

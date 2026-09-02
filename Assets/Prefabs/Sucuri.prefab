@@ -114,9 +114,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7965781414353252071}
   - component: {fileID: 353835577613442224}
-  - component: {fileID: 5122578046940777348}
   - component: {fileID: 1884579875941776961}
   - component: {fileID: 8637659342318847676}
+  - component: {fileID: 5122578046940777348}
   - component: {fileID: 3944048699825822595}
   m_Layer: 0
   m_Name: Sucuri
@@ -200,22 +200,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &5122578046940777348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1441119605310400985}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ec706ddfe704c3428a1b46b3d3bd6c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::enemyGeral
-  vida: 12
-  barraVida: {fileID: 7054379697246735614}
-  player: {fileID: 0}
-  horizontalSpeed: 6
 --- !u!61 &1884579875941776961
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -246,7 +230,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -289,6 +273,23 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &5122578046940777348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1441119605310400985}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ec706ddfe704c3428a1b46b3d3bd6c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::enemyGeral
+  vida: 6
+  barraVida: {fileID: 7054379697246735614}
+  gameOverPanel: {fileID: 0}
+  player: {fileID: 0}
+  horizontalSpeed: 6
 --- !u!114 &3944048699825822595
 MonoBehaviour:
   m_ObjectHideFlags: 0

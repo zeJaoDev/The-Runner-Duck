@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 1172737244151888794}
   - component: {fileID: 6961330456007929438}
   - component: {fileID: -901277918016830276}
+  - component: {fileID: -3075359944597814255}
+  - component: {fileID: 7552801890989881336}
   m_Layer: 0
   m_Name: Onca
   m_TagString: Enemy
@@ -166,3 +168,33 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-3075359944597814255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8727942132927311531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ec706ddfe704c3428a1b46b3d3bd6c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::enemyGeral
+  vida: 0
+  barraVida: {fileID: 0}
+  gameOverPanel: {fileID: 0}
+  player: {fileID: 0}
+  horizontalSpeed: 3
+--- !u!114 &7552801890989881336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8727942132927311531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 809cf52d14492884daf7e3f74c1d4833, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyFollow
+  speed: 5

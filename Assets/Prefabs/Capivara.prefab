@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2215135635253582585}
   - component: {fileID: 5969087019964073119}
   - component: {fileID: 8287112686836690112}
+  - component: {fileID: -6073771428450658996}
+  - component: {fileID: 4962557755336906605}
   m_Layer: 0
   m_Name: Capivara
   m_TagString: Enemy
@@ -166,3 +168,33 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-6073771428450658996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5650041721859137872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ec706ddfe704c3428a1b46b3d3bd6c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::enemyGeral
+  vida: 0
+  barraVida: {fileID: 0}
+  gameOverPanel: {fileID: 0}
+  player: {fileID: 0}
+  horizontalSpeed: 3
+--- !u!114 &4962557755336906605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5650041721859137872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 809cf52d14492884daf7e3f74c1d4833, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyFollow
+  speed: 5

@@ -1,14 +1,8 @@
-using System.Runtime.CompilerServices;
-
 using UnityEngine;
-
 using UnityEngine.InputSystem;
-
 using System.Collections;
 
-using System.Collections.Generic;
 
-using Unity.VisualScripting;
 
 public class PlayerMove : MonoBehaviour
 
@@ -29,10 +23,18 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private GameObject BarraVida;
 
+
     private bool dead = false;
 
-    // Freeze state
     public bool IsFrozen { get; private set; }
+
+    [SerializeField] private float velocidadeDeEscape = 8f;
+    [SerializeField] private float duracaoDoEscape = 0.3f;
+
+    private bool saindoDaArmadilha = false;
+    private float ultimaDirecaoHorizontal = 1f;
+
+    private RigidbodyConstraints2D constraintsOriginais;
 
     public void Morrer()
     {
@@ -54,9 +56,23 @@ public class PlayerMove : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    private void Awake()
+    {
+        if (playerPhysics == null)
+        {
+            playerPhysics = GetComponent<Rigidbody2D>();
+        }
+
+        if (playerPhysics != null)
+        {
+            constraintsOriginais = playerPhysics.constraints;
+        }
+    }
+
     public void Freeze()
     {
-        if (IsFrozen) return;
+        if (dead || IsFrozen) return;
+
         IsFrozen = true;
 
         if (playerPhysics != null)
@@ -71,15 +87,37 @@ public class PlayerMove : MonoBehaviour
 
     public void Unfreeze()
     {
-        if (!IsFrozen) return;
+        if (dead || !IsFrozen) return;
+
         IsFrozen = false;
 
         if (playerPhysics != null)
         {
-            playerPhysics.constraints = RigidbodyConstraints2D.None;
+            playerPhysics.constraints = constraintsOriginais;
+            playerPhysics.WakeUp();
         }
 
         enabled = true;
+    }
+
+    public void EscaparDaArmadilha(float direcaoDeSaida)
+    {
+        if (dead || !IsFrozen) return;
+
+        ultimaDirecaoHorizontal =
+            direcaoDeSaida < 0f ? -1f : 1f;
+
+        IsFrozen = false;
+        saindoDaArmadilha = true;
+
+        if (playerPhysics != null)
+        {
+            playerPhysics.constraints = constraintsOriginais;
+            playerPhysics.WakeUp();
+        }
+
+        enabled = true;
+        StartCoroutine(SaidaAutomatica());
     }
 
     private void OnEnable()
@@ -90,33 +128,86 @@ public class PlayerMove : MonoBehaviour
     }
     private void OnDisable()
     {
+        playerJump.performed -= DoJump;
         playerControls.Disable();
         playerJump.Disable();
     }
 
     void Start() { }
 
-    void Update()
+    private void Update()
     {
-        if (IsFrozen) return;
+        if (IsFrozen ||
+            saindoDaArmadilha ||
+            playerPhysics == null)
+        {
+            return;
+        }
 
         playerDirection = playerControls.ReadValue<Vector2>();
-       
-        playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerPhysics.linearVelocity.y);
 
-        if (Input.GetMouseButtonDown(0)) Shoot();
+        if (Mathf.Abs(playerDirection.x) > 0.01f)
+        {
+            ultimaDirecaoHorizontal =
+                Mathf.Sign(playerDirection.x);
+        }
+
+        playerPhysics.linearVelocity = new Vector2(
+            playerDirection.x * playerSpeed,
+            playerPhysics.linearVelocity.y
+        );
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Shoot();
+        }
+    }
+
+    private IEnumerator SaidaAutomatica()
+    {
+        float tempoDecorrido = 0f;
+
+        while (tempoDecorrido < duracaoDoEscape && !dead)
+        {
+            if (playerPhysics != null)
+            {
+                playerPhysics.linearVelocity = new Vector2(
+                    ultimaDirecaoHorizontal * velocidadeDeEscape,
+                    playerPhysics.linearVelocity.y
+                );
+            }
+
+            tempoDecorrido += Time.deltaTime;
+            yield return null;
+        }
+
+        if (playerPhysics != null)
+        {
+            playerPhysics.linearVelocity = new Vector2(ultimaDirecaoHorizontal * velocidadeDeEscape, 0f);
+        }
+
+        saindoDaArmadilha = false;
     }
 
     public void DoJump(InputAction.CallbackContext context)
     {
-        if (IsFrozen) return;
-        playerPhysics.linearVelocity = new Vector2(playerDirection.x * playerSpeed, playerJumpHeight);
+        if (IsFrozen || playerPhysics == null) return;
+
+        playerPhysics.linearVelocity = new Vector2(
+            playerDirection.x * playerSpeed,
+            playerJumpHeight
+        );
     }
 
     private void FixedUpdate() { }
 
     private void Shoot()
     {
+        if (shotWaterPrefab == null || firingPoint == null)
+        {
+            return;
+        }
+
         Instantiate(shotWaterPrefab, firingPoint.position, firingPoint.rotation);
     }
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class runCrocodile : MonoBehaviour
@@ -7,27 +5,61 @@ public class runCrocodile : MonoBehaviour
     public Transform player;
     public float speed = 3f;
     public GameObject gameOverPanel;
-    void Start()
+
+    private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Duck").transform;
+        if (player == null)
+        {
+            GameObject duck = GameObject.FindGameObjectWithTag("Duck");
+
+            if (duck != null)
+            {
+                player = duck.transform;
+            }
+            else
+            {
+                enabled = false;
+            }
+        }
     }
-    void Update()
+
+    private void Update()
     {
-        transform.position = new Vector2(Mathf.MoveTowards(transform.position.x, player.position.x, speed * Time.deltaTime), transform.position.y);
+        if (player == null)
+        {
+            enabled = false;
+            return;
+        }
+
+        float novaPosicaoX = Mathf.MoveTowards(
+            transform.position.x,
+            player.position.x,
+            speed * Time.deltaTime
+        );
+
+        transform.position = new Vector2(
+            novaPosicaoX,
+            transform.position.y
+        );
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Duck"))
+        if (!collision.gameObject.CompareTag("Duck")) return;
+
+        PlayerMove movement =
+            collision.gameObject.GetComponentInParent<PlayerMove>();
+
+        if (movement != null)
+        {
+            movement.Morrer();
+        }
+        else if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-
-            PlayerMove movement = collision.gameObject.GetComponent<PlayerMove>();
-
-            if (movement != null)
-            {
-                movement.enabled = false;
-            }
         }
+
+        // O crocodilo para de procurar o jogador.
+        enabled = false;
     }
 }
