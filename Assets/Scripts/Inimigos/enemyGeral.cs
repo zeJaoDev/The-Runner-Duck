@@ -3,111 +3,154 @@ using UnityEngine;
 public class enemyGeral : MonoBehaviour
 {
     [Header("Vida")]
-    [SerializeField] private int vida;
+    [SerializeField] private float vidaMaxima = 30f;
+    [SerializeField] private float danoDoTiro = 10f;
     [SerializeField] private BarraVida barraVida;
 
     [Header("Game Over")]
     [SerializeField] private GameObject gameOverPanel;
 
     [Header("Movimentação")]
-    public Transform player;
-    public float horizontalSpeed = 3f;
+    [SerializeField] private Transform player;
+    [SerializeField] private float horizontalSpeed = 3f;
+
+    private float vidaAtual;
+    private bool morreu;
 
     private void Start()
     {
-        if (player == null)
-        {
-            GameObject duck =
-                GameObject.FindGameObjectWithTag("Duck");
-
-            if (duck != null)
-            {
-                player = duck.transform;
-            }
-            else
-            {
-                enabled = false;
-            }
-        }
-
-        if (barraVida != null)
-        {
-            barraVida.VidaMax = vida;
-            barraVida.Vida = vida;
-        }
+        ProcurarBarraDeVida();
+        InicializarVida();
+        ProcurarJogador();
     }
 
     private void Update()
     {
+        if (morreu)
+        {
+            return;
+        }
+
         if (player == null)
         {
             enabled = false;
             return;
         }
 
-        if (vida > 0)
-        {
-            Mover();
-        }
-    }
-
-    public void ReceberDano()
-    {
-        if (vida <= 0) return;
-
-        vida--;
-
-        if (barraVida != null)
-        {
-            barraVida.Vida = vida;
-        }
-
-        if (vida <= 0)
-        {
-            Destroy(gameObject);
-
-            // Quando adicionar animação:
-            // animator.SetBool("eliminado", true);
-        }
-        else
-        {
-            // Quando adicionar animação:
-            // animator.SetTrigger("recebendoDano");
-        }
+        MoverEmDirecaoAoJogador();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Duck"))
+        if (!collision.gameObject.CompareTag("Duck"))
         {
-            PlayerMove duck =
-                collision.gameObject.GetComponentInParent<PlayerMove>();
-
-            if (duck != null)
-            {
-                // O próprio Morrer() mostra o painel e pausa o jogo.
-                duck.Morrer();
-            }
-            else if (gameOverPanel != null)
-            {
-                // Segurança caso o PlayerMove não seja encontrado.
-                gameOverPanel.SetActive(true);
-            }
-
-            // O inimigo para de perseguir o jogador.
-            enabled = false;
             return;
         }
 
-        if (collision.gameObject.CompareTag("Enemy"))
+        PlayerMove jogador =
+            collision.gameObject.GetComponentInParent<PlayerMove>();
+
+        if (jogador != null)
         {
-            Destroy(gameObject);
+            jogador.Morrer();
+        }
+        else if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        enabled = false;
+    }
+
+    public void ReceberDano()
+    {
+        ReceberDano(danoDoTiro);
+    }
+
+    public void ReceberDano(float quantidadeDeDano)
+    {
+        if (morreu || vidaAtual <= 0f)
+        {
+            return;
+        }
+
+        vidaAtual -= quantidadeDeDano;
+
+        vidaAtual = Mathf.Clamp(
+            vidaAtual,
+            0f,
+            vidaMaxima
+        );
+
+        if (barraVida != null)
+        {
+            barraVida.AlterarVida(vidaAtual);
+        }
+
+        if (vidaAtual <= 0f)
+        {
+            MorrerInimigo();
         }
     }
 
-    private void Mover()
+    private void ProcurarBarraDeVida()
     {
-        if (player == null) return;
+        if (barraVida != null)
+        {
+            return;
+        }
+
+        barraVida = GetComponentInChildren<BarraVida>(true);
+    }
+
+    private void InicializarVida()
+    {
+        vidaAtual = vidaMaxima;
+
+        if (barraVida != null)
+        {
+            barraVida.gameObject.SetActive(true);
+            barraVida.SetVidaMaxima(vidaMaxima);
+            barraVida.AlterarVida(vidaAtual);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "A BarraVida não foi encontrada no inimigo!",
+                gameObject
+            );
+        }
+    }
+
+    private void ProcurarJogador()
+    {
+        if (player != null)
+        {
+            return;
+        }
+
+        GameObject objetoJogador =
+            GameObject.FindGameObjectWithTag("Duck");
+
+        if (objetoJogador != null)
+        {
+            player = objetoJogador.transform;
+        }
+        else
+        {
+            Debug.LogWarning(
+                "Nenhum jogador com a tag Duck foi encontrado!",
+                gameObject
+            );
+        }
+    }
+
+    private void MoverEmDirecaoAoJogador()
+    {
+        if (player == null)
+        {
+            return;
+        }
 
         float novaPosicaoX = Mathf.MoveTowards(
             transform.position.x,
@@ -119,5 +162,18 @@ public class enemyGeral : MonoBehaviour
             novaPosicaoX,
             transform.position.y
         );
+    }
+
+    private void MorrerInimigo()
+    {
+        if (morreu)
+        {
+            return;
+        }
+
+        morreu = true;
+        enabled = false;
+
+        Destroy(gameObject);
     }
 }

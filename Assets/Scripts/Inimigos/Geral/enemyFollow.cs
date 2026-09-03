@@ -2,23 +2,37 @@ using UnityEngine;
 
 public class EnemyFollow : MonoBehaviour
 {
-    private Transform player;
+    [Header("Movimentação")]
     public float speed = 5f;
 
-    void Start()
+    private Transform jogador;
+
+    private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Duck").transform;
+        ProcurarJogador();
     }
 
-    void Update()
+    private void Update()
     {
-        if (player != null)
+        if (jogador != null)
         {
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                player.position,
-                speed * Time.deltaTime
-            );
+            MoverEmDirecaoAoJogador();
         }
+    }
+
+    private void ProcurarJogador()
+    {
+        jogador = GameObject
+            .FindGameObjectWithTag("Duck")
+            .transform;
+    }
+
+    private void MoverEmDirecaoAoJogador()
+    {
+        transform.position = Vector2.MoveTowards(
+            transform.position,
+            jogador.position,
+            speed * Time.deltaTime
+        );
     }
 }

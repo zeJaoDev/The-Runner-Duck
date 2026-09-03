@@ -187,8 +187,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a22bc453f5dcb94ebb0f90b2fa32aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::sandTrap
-  velocidade: 2
-  limiteY: -6
+  velocidadeInicial: 5
+  aumentoPorSegundo: 0.1
+  velocidadeMaxima: 12
+  limiteY: -10
+  multiplicadorQuandoPreso: 0.9
+  tempoLentoAposEscapar: 0.75
+  duracaoDoRetorno: 1.5
   pontoDeCaptura: {fileID: 522235790328089383}
   alternanciasParaEscapar: 4
   distanciaDoDebate: 0.15

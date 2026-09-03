@@ -1,43 +1,64 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class attackCharacters : MonoBehaviour
 {
-
-    [Range(1, 10)]
+    [Header("Movimentação")]
+    [Range(1f, 10f)]
     [SerializeField] private float speed = 10f;
 
-    [Range(1, 10)]
+    [Header("Dano")]
+    [SerializeField] private float dano = 10f;
+
+    [Header("Tempo de vida")]
+    [Range(1f, 10f)]
     [SerializeField] private float lifetime = 3f;
 
-    private Rigidbody2D rb;
+    private Rigidbody2D corpoRigido;
+    private bool acertouInimigo;
 
-    void Start()
+    private void Awake()
     {
-        
-     rb = GetComponent<Rigidbody2D>();
-     Destroy(gameObject, lifetime);
-
-   
+        corpoRigido = GetComponent<Rigidbody2D>();
     }
 
-    private void FixedUpdate()
+    private void Start()
     {
-        
-     rb.linearVelocity = transform.up * speed;
+        MovimentarTiro();
 
+        Destroy(
+            gameObject,
+            lifetime
+        );
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D outroColisor)
     {
-        enemyGeral enemy = other.GetComponent<enemyGeral>();
-
-        if (enemy != null)
+        if (acertouInimigo)
         {
-            enemy.ReceberDano();
-            Destroy(gameObject);
+            return;
         }
+
+        enemyGeral inimigo =
+            outroColisor.GetComponentInParent<enemyGeral>();
+
+        if (inimigo == null)
+        {
+            return;
+        }
+
+        acertouInimigo = true;
+
+        // Aplica ao inimigo o dano configurado no Inspector.
+        inimigo.ReceberDano(dano);
+
+        // Destrói somente o tiro após acertar o inimigo.
+        Destroy(gameObject);
     }
 
+    private void MovimentarTiro()
+    {
+        corpoRigido.linearVelocity =
+            (Vector2)transform.up * speed;
+    }
 }

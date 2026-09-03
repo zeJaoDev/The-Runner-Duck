@@ -1,67 +1,193 @@
+using System.Collections;
 using UnityEngine;
 
 public class TrapSpawner : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject sandTrapPrefab;
+    [Header("Armadilha")]
+    [SerializeField] private GameObject sandTrapPrefab;
 
-    [SerializeField]
-    private float minX = -4f;
+    [Header("Área de criação")]
+    [SerializeField] private float minX = -4f;
+    [SerializeField] private float maxX = 4f;
+    [SerializeField] private float spawnY = 6f;
 
-    [SerializeField]
-    private float maxX = 4f;
+    [Header("Intervalo de criação")]
+    [SerializeField] private float atrasoInicial = 1f;
+    [SerializeField] private float intervaloMinimo = 1.5f;
+    [SerializeField] private float intervaloMaximo = 3f;
 
-    [SerializeField]
-    private float spawnY = 6f;
+    [Header("Mira no jogador")]
+    [Range(0f, 1f)]
+    [SerializeField] private float chanceDeSpawnarNoJogador = 0.8f;
 
-    [SerializeField]
-    private float intervaloSpawn = 2f;
+    [Header("Distância entre armadilhas")]
+    [SerializeField] private float distanciaMinimaHorizontal = 1.5f;
+    [SerializeField] private float distanciaMinimaVertical = 2.5f;
+    [SerializeField] private int maximoDeTentativas = 50;
 
-    [SerializeField]
-    private float distanciaMinima = 2.5f;
+    private Transform jogador;
 
     private void Start()
     {
-        InvokeRepeating(nameof(SpawnTrap), 1f, intervaloSpawn);
+        ProcurarJogador();
+        StartCoroutine(RotinaDeCriacaoDeArmadilhas());
     }
 
-    private void SpawnTrap()
+    private IEnumerator RotinaDeCriacaoDeArmadilhas()
     {
-        float posX = GerarPosicaoSegura();
+        yield return new WaitForSeconds(atrasoInicial);
+
+        while (true)
+        {
+            CriarArmadilha();
+
+            float menorIntervalo = Mathf.Min(
+                intervaloMinimo,
+                intervaloMaximo
+            );
+
+            float maiorIntervalo = Mathf.Max(
+                intervaloMinimo,
+                intervaloMaximo
+            );
+
+            float proximoIntervalo = Random.Range(
+                menorIntervalo,
+                maiorIntervalo
+            );
+
+            yield return new WaitForSeconds(proximoIntervalo);
+        }
+    }
+
+    private void CriarArmadilha()
+    {
+        if (sandTrapPrefab == null)
+        {
+            return;
+        }
+
+        if (jogador == null)
+        {
+            ProcurarJogador();
+        }
+
+        if (!TentarGerarPosicao(out Vector2 posicao))
+        {
+            // Nenhuma posição segura foi encontrada.
+            // Ignora somente esta tentativa de criação.
+            return;
+        }
 
         Instantiate(
             sandTrapPrefab,
-            new Vector2(posX, spawnY),
+            posicao,
             Quaternion.identity
         );
     }
 
-    private float GerarPosicaoSegura()
+    private void ProcurarJogador()
     {
-        float novaPosicaoX;
-        int tentativas = 0;
+        GameObject objetoJogador =
+            GameObject.FindGameObjectWithTag("Duck");
 
-        do
+        if (objetoJogador != null)
         {
-            novaPosicaoX = Random.Range(minX, maxX);
-            tentativas++;
+            jogador = objetoJogador.transform;
         }
-        while (!PosicaoValida(novaPosicaoX) && tentativas < 20);
-
-        return novaPosicaoX;
     }
 
-    private bool PosicaoValida(float posX)
+    private bool TentarGerarPosicao(out Vector2 posicaoEncontrada)
     {
-        GameObject[] traps = GameObject.FindGameObjectsWithTag("Trap");
+        bool tentarNoEixoDoJogador =
+            jogador != null &&
+            Random.value <= chanceDeSpawnarNoJogador;
 
-        foreach (GameObject trap in traps)
+        if (tentarNoEixoDoJogador)
         {
-            float distancia =
-                Mathf.Abs(trap.transform.position.x - posX);
+            float posicaoXDoJogador = Mathf.Clamp(
+                jogador.position.x,
+                minX,
+                maxX
+            );
 
-            if (distancia < distanciaMinima)
+            Vector2 posicaoDoJogador = new Vector2(
+                posicaoXDoJogador,
+                spawnY
+            );
+
+            // O mesmo X pode ser usado novamente,
+            // desde que a armadilha anterior já tenha
+            // descido o suficiente.
+            if (PosicaoValida(posicaoDoJogador))
+            {
+                posicaoEncontrada = posicaoDoJogador;
+                return true;
+            }
+
+            // Se estiver muito próximo de outra armadilha,
+            // procura uma posição aleatória.
+        }
+
+        for (
+            int tentativa = 0;
+            tentativa < maximoDeTentativas;
+            tentativa++
+        )
+        {
+            Vector2 posicaoAleatoria = new Vector2(
+                Random.Range(minX, maxX),
+                spawnY
+            );
+
+            if (PosicaoValida(posicaoAleatoria))
+            {
+                posicaoEncontrada = posicaoAleatoria;
+                return true;
+            }
+        }
+
+        posicaoEncontrada = Vector2.zero;
+        return false;
+    }
+
+    private bool PosicaoValida(Vector2 posicaoTestada)
+    {
+        sandTrap[] armadilhas = FindObjectsByType<sandTrap>(
+            FindObjectsSortMode.None
+        );
+
+        foreach (sandTrap armadilha in armadilhas)
+        {
+            if (armadilha == null)
+            {
+                continue;
+            }
+
+            Vector2 posicaoDaArmadilha =
+                armadilha.transform.position;
+
+            float distanciaHorizontal = Mathf.Abs(
+                posicaoTestada.x - posicaoDaArmadilha.x
+            );
+
+            float distanciaVertical = Mathf.Abs(
+                posicaoTestada.y - posicaoDaArmadilha.y
+            );
+
+            bool estaPertoHorizontalmente =
+                distanciaHorizontal < distanciaMinimaHorizontal;
+
+            bool estaPertoVerticalmente =
+                distanciaVertical < distanciaMinimaVertical;
+
+            // Bloqueia a posição somente quando outra
+            // armadilha estiver próxima nos dois eixos.
+            if (estaPertoHorizontalmente &&
+                estaPertoVerticalmente)
+            {
                 return false;
+            }
         }
 
         return true;

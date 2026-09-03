@@ -1,41 +1,52 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    [Header("Inimigo")]
     [SerializeField] private GameObject enemyPrefab;
 
-    // Área horizontal onde os inimigos podem surgir
+    [Header("Área de criação")]
     [SerializeField] private float minX = -8f;
     [SerializeField] private float maxX = 8f;
 
-    // Tempo aleatório entre um spawn e outro
+    [Header("Intervalo de criação")]
     [SerializeField] private float minSpawnTime = 1f;
     [SerializeField] private float maxSpawnTime = 4f;
 
     private void Start()
     {
-        StartCoroutine(SpawnEnemies());
+        StartCoroutine(RotinaDeCriacaoDeInimigos());
     }
 
-    private IEnumerator SpawnEnemies()
+    private IEnumerator RotinaDeCriacaoDeInimigos()
     {
         while (true)
         {
-            // Escolhe posição aleatória
-            float randomX = Random.Range(minX, maxX);
+            float posicaoXAleatoria = Random.Range(
+                minX,
+                maxX
+            );
 
-            Vector2 spawnPosition = new Vector2(
-                randomX,
+            Vector2 posicaoDeCriacao = new Vector2(
+                posicaoXAleatoria,
                 transform.position.y
             );
 
-            // Cria o inimigo
-            Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+            Instantiate(
+                enemyPrefab,
+                posicaoDeCriacao,
+                Quaternion.identity
+            );
 
-            // Espera um tempo aleatório
-            float randomTime = Random.Range(minSpawnTime, maxSpawnTime);
-            yield return new WaitForSeconds(randomTime);
+            float intervaloAleatorio = Random.Range(
+                minSpawnTime,
+                maxSpawnTime
+            );
+
+            yield return new WaitForSeconds(
+                intervaloAleatorio
+            );
         }
     }
 }

@@ -3,16 +3,53 @@ using UnityEngine.UI;
 
 public class BarraVida : MonoBehaviour
 {
-  [SerializeField]
-private Slider slider;
+    [Header("Componentes")]
+    [SerializeField] private Slider slider;
 
-public int VidaMax
-{
-set { slider.maxValue = value; }
-}
+    private void Awake()
+    {
+        ProcurarSlider();
+    }
 
-public int Vida
-{
-set { slider.value = value; }
-}
+    public void SetVidaMaxima(float vida)
+    {
+        if (slider == null)
+        {
+            return;
+        }
+
+        slider.minValue = 0f;
+        slider.maxValue = vida;
+        slider.value = vida;
+    }
+
+    public void AlterarVida(float vida)
+    {
+        if (slider == null)
+        {
+            return;
+        }
+
+        slider.value = Mathf.Clamp(
+            vida,
+            slider.minValue,
+            slider.maxValue
+        );
+    }
+
+    private void ProcurarSlider()
+    {
+        if (slider == null)
+        {
+            slider = GetComponentInChildren<Slider>(true);
+        }
+
+        if (slider == null)
+        {
+            Debug.LogError(
+                "Nenhum Slider foi encontrado na BarraVida!",
+                gameObject
+            );
+        }
+    }
 }
