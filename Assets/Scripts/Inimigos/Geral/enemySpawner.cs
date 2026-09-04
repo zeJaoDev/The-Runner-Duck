@@ -14,39 +14,92 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float minSpawnTime = 1f;
     [SerializeField] private float maxSpawnTime = 4f;
 
-    private void Start()
+    private Coroutine rotinaDeCriacao;
+
+    private void OnEnable()
     {
-        StartCoroutine(RotinaDeCriacaoDeInimigos());
+        IniciarRotinaDeCriacao();
+    }
+
+    private void OnDisable()
+    {
+        PararRotinaDeCriacao();
+    }
+
+    private void IniciarRotinaDeCriacao()
+    {
+        if (enemyPrefab == null)
+        {
+            Debug.LogWarning(
+                "O prefab do inimigo não foi configurado!",
+                gameObject
+            );
+
+            return;
+        }
+
+        if (rotinaDeCriacao == null)
+        {
+            rotinaDeCriacao = StartCoroutine(
+                RotinaDeCriacaoDeInimigos()
+            );
+        }
+    }
+
+    private void PararRotinaDeCriacao()
+    {
+        if (rotinaDeCriacao == null)
+        {
+            return;
+        }
+
+        StopCoroutine(rotinaDeCriacao);
+        rotinaDeCriacao = null;
     }
 
     private IEnumerator RotinaDeCriacaoDeInimigos()
     {
         while (true)
         {
-            float posicaoXAleatoria = Random.Range(
-                minX,
-                maxX
+            // Espera o jogador apertar Jogar.
+            // No menu o Time.timeScale está em zero.
+            yield return new WaitUntil(
+                () => Time.timeScale > 0f
             );
 
-            Vector2 posicaoDeCriacao = new Vector2(
-                posicaoXAleatoria,
-                transform.position.y
-            );
+            CriarInimigo();
 
-            Instantiate(
-                enemyPrefab,
-                posicaoDeCriacao,
-                Quaternion.identity
-            );
-
-            float intervaloAleatorio = Random.Range(
-                minSpawnTime,
-                maxSpawnTime
-            );
+            float intervaloAleatorio =
+                Random.Range(
+                    minSpawnTime,
+                    maxSpawnTime
+                );
 
             yield return new WaitForSeconds(
                 intervaloAleatorio
             );
         }
+    }
+
+    private void CriarInimigo()
+    {
+        float posicaoXAleatoria =
+            Random.Range(minX, maxX);
+
+        Vector2 posicaoDeCriacao =
+            new Vector2(
+                posicaoXAleatoria,
+                transform.position.y
+            );
+
+        // O inimigo se torna filho do EnemySpawner.
+        // Como o spawner está no ConteudoDoJogo,
+        // o inimigo e sua barra somem no menu.
+        Instantiate(
+            enemyPrefab,
+            posicaoDeCriacao,
+            Quaternion.identity,
+            transform
+        );
     }
 }

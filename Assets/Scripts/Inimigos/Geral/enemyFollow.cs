@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyFollow : MonoBehaviour
 {
     [Header("Movimentação")]
-    public float speed = 5f;
+    [SerializeField] private float speed = 5f;
 
     private Transform jogador;
 
@@ -14,21 +14,51 @@ public class EnemyFollow : MonoBehaviour
 
     private void Update()
     {
-        if (jogador != null)
+        // Não procura nem movimenta o inimigo
+        // enquanto estiver no menu ou nos créditos.
+        if (Time.timeScale <= 0f)
         {
-            MoverEmDirecaoAoJogador();
+            return;
         }
+
+        // Tenta encontrar novamente quando o
+        // jogador for ativado pelo botão Jogar.
+        if (jogador == null)
+        {
+            bool encontrouJogador =
+                ProcurarJogador();
+
+            if (!encontrouJogador)
+            {
+                return;
+            }
+        }
+
+        MoverEmDirecaoAoJogador();
     }
 
-    private void ProcurarJogador()
+    private bool ProcurarJogador()
     {
-        jogador = GameObject
-            .FindGameObjectWithTag("Duck")
-            .transform;
+        GameObject objetoJogador =
+            GameObject.FindGameObjectWithTag("Duck");
+
+        if (objetoJogador == null)
+        {
+            jogador = null;
+            return false;
+        }
+
+        jogador = objetoJogador.transform;
+        return true;
     }
 
     private void MoverEmDirecaoAoJogador()
     {
+        if (jogador == null)
+        {
+            return;
+        }
+
         transform.position = Vector2.MoveTowards(
             transform.position,
             jogador.position,

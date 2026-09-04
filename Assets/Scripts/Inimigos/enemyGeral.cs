@@ -19,9 +19,13 @@ public class enemyGeral : MonoBehaviour
 
     private void Start()
     {
-        ProcurarBarraDeVida();
+        EncontrarBarraDeVida();
         InicializarVida();
-        ProcurarJogador();
+
+        if (Time.timeScale > 0f)
+        {
+            ProcurarJogador();
+        }
     }
 
     private void Update()
@@ -31,35 +35,28 @@ public class enemyGeral : MonoBehaviour
             return;
         }
 
+        // Esconde a barra no menu, créditos
+        // e na tela de Game Over.
+        if (Time.timeScale <= 0f)
+        {
+            DefinirVisibilidadeDaBarra(false);
+            return;
+        }
+
+        DefinirVisibilidadeDaBarra(true);
+
         if (player == null)
         {
-            enabled = false;
-            return;
+            bool encontrouJogador =
+                ProcurarJogador();
+
+            if (!encontrouJogador)
+            {
+                return;
+            }
         }
 
         MoverEmDirecaoAoJogador();
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (!collision.gameObject.CompareTag("Duck"))
-        {
-            return;
-        }
-
-        PlayerMove jogador =
-            collision.gameObject.GetComponentInParent<PlayerMove>();
-
-        if (jogador != null)
-        {
-            jogador.Morrer();
-        }
-        else if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-        }
-
-        enabled = false;
     }
 
     public void ReceberDano()
@@ -93,56 +90,92 @@ public class enemyGeral : MonoBehaviour
         }
     }
 
-    private void ProcurarBarraDeVida()
+    private void MorrerInimigo()
     {
-        if (barraVida != null)
+        if (morreu)
         {
             return;
         }
 
-        barraVida = GetComponentInChildren<BarraVida>(true);
+        morreu = true;
+
+        // Registra uma kill antes de destruir o inimigo.
+        if (ContadorKills.Instancia != null)
+        {
+            ContadorKills.Instancia.RegistrarKill();
+        }
+
+        Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter2D(
+        Collision2D collision)
+    {
+        if (!collision.gameObject.CompareTag("Duck"))
+        {
+            return;
+        }
+
+        PlayerMove jogadorEncontrado =
+            collision.gameObject
+                .GetComponentInParent<PlayerMove>();
+
+        if (jogadorEncontrado != null)
+        {
+            jogadorEncontrado.Morrer();
+        }
+        else if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        enabled = false;
+    }
+
+    private void EncontrarBarraDeVida()
+    {
+        if (barraVida == null)
+        {
+            barraVida =
+                GetComponentInChildren<BarraVida>(true);
+        }
     }
 
     private void InicializarVida()
     {
         vidaAtual = vidaMaxima;
 
-        if (barraVida != null)
-        {
-            barraVida.gameObject.SetActive(true);
-            barraVida.SetVidaMaxima(vidaMaxima);
-            barraVida.AlterarVida(vidaAtual);
-        }
-        else
+        if (barraVida == null)
         {
             Debug.LogWarning(
                 "A BarraVida não foi encontrada no inimigo!",
                 gameObject
             );
-        }
-    }
 
-    private void ProcurarJogador()
-    {
-        if (player != null)
-        {
             return;
         }
 
+        barraVida.SetVidaMaxima(vidaMaxima);
+        barraVida.AlterarVida(vidaAtual);
+
+        DefinirVisibilidadeDaBarra(
+            Time.timeScale > 0f
+        );
+    }
+
+    private bool ProcurarJogador()
+    {
         GameObject objetoJogador =
             GameObject.FindGameObjectWithTag("Duck");
 
-        if (objetoJogador != null)
+        if (objetoJogador == null)
         {
-            player = objetoJogador.transform;
+            player = null;
+            return false;
         }
-        else
-        {
-            Debug.LogWarning(
-                "Nenhum jogador com a tag Duck foi encontrado!",
-                gameObject
-            );
-        }
+
+        player = objetoJogador.transform;
+        return true;
     }
 
     private void MoverEmDirecaoAoJogador()
@@ -164,16 +197,13 @@ public class enemyGeral : MonoBehaviour
         );
     }
 
-    private void MorrerInimigo()
+    private void DefinirVisibilidadeDaBarra(
+        bool mostrar)
     {
-        if (morreu)
+        if (barraVida != null &&
+            barraVida.gameObject.activeSelf != mostrar)
         {
-            return;
+            barraVida.gameObject.SetActive(mostrar);
         }
-
-        morreu = true;
-        enabled = false;
-
-        Destroy(gameObject);
     }
 }

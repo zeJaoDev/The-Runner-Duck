@@ -5,8 +5,12 @@ public class ControleDeCena : MonoBehaviour
 {
     [Header("Telas")]
     [SerializeField] private GameObject telaInicial;
+    [SerializeField] private GameObject telaCreditos;
     [SerializeField] private GameObject interfaceDoJogo;
     [SerializeField] private GameObject gameOverPanel;
+
+    [Header("Objetos do jogo")]
+    [SerializeField] private GameObject conteudoDoJogo;
 
     private static bool iniciarDiretamente;
 
@@ -34,35 +38,37 @@ public class ControleDeCena : MonoBehaviour
 
     public void IniciarJogo()
     {
-        if (telaInicial == null)
-        {
-            Debug.LogError(
-                "O painel TelaInicial não foi configurado!",
-                gameObject
-            );
-
-            return;
-        }
-
-        telaInicial.SetActive(false);
-
-        if (interfaceDoJogo != null)
-        {
-            interfaceDoJogo.SetActive(true);
-        }
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
-
         Time.timeScale = 1f;
+
+        DefinirObjetoAtivo(telaInicial, false);
+        DefinirObjetoAtivo(telaCreditos, false);
+        DefinirObjetoAtivo(gameOverPanel, false);
+
+        DefinirObjetoAtivo(interfaceDoJogo, true);
+        DefinirObjetoAtivo(conteudoDoJogo, true);
+    }
+
+    public void AbrirCreditos()
+    {
+        Time.timeScale = 0f;
+
+        DefinirObjetoAtivo(telaInicial, false);
+        DefinirObjetoAtivo(interfaceDoJogo, false);
+        DefinirObjetoAtivo(gameOverPanel, false);
+        DefinirObjetoAtivo(conteudoDoJogo, false);
+
+        DefinirObjetoAtivo(telaCreditos, true);
+    }
+
+    public void FecharCreditos()
+    {
+        MostrarTelaInicial();
     }
 
     public void ReiniciarJogo()
     {
-        // Recarrega a cena e inicia a partida
-        // sem mostrar a tela inicial.
+        // Recarrega a cena e inicia
+        // diretamente a partida.
         iniciarDiretamente = true;
 
         RecarregarCena();
@@ -70,30 +76,38 @@ public class ControleDeCena : MonoBehaviour
 
     public void VoltarParaTelaInicial()
     {
-        // Recarrega tudo e volta para o menu.
+        // Recarrega tudo e mostra
+        // novamente a tela inicial.
         iniciarDiretamente = false;
 
         RecarregarCena();
+    }
+
+    public void SairDoJogo()
+    {
+        Time.timeScale = 1f;
+
+        Debug.Log("Saindo do jogo...");
+
+#if UNITY_EDITOR
+        // Para o Play Mode dentro da Unity.
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // Fecha o jogo compilado.
+        Application.Quit();
+#endif
     }
 
     private void MostrarTelaInicial()
     {
         Time.timeScale = 0f;
 
-        if (telaInicial != null)
-        {
-            telaInicial.SetActive(true);
-        }
+        DefinirObjetoAtivo(telaInicial, true);
 
-        if (interfaceDoJogo != null)
-        {
-            interfaceDoJogo.SetActive(false);
-        }
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
+        DefinirObjetoAtivo(telaCreditos, false);
+        DefinirObjetoAtivo(interfaceDoJogo, false);
+        DefinirObjetoAtivo(gameOverPanel, false);
+        DefinirObjetoAtivo(conteudoDoJogo, false);
     }
 
     private void RecarregarCena()
@@ -105,12 +119,30 @@ public class ControleDeCena : MonoBehaviour
         );
     }
 
+    private void DefinirObjetoAtivo(
+        GameObject objeto,
+        bool ativar)
+    {
+        if (objeto != null)
+        {
+            objeto.SetActive(ativar);
+        }
+    }
+
     private void VerificarConfiguracao()
     {
         if (telaInicial == null)
         {
             Debug.LogWarning(
-                "Arraste o painel TelaInicial para o ControleDeCena.",
+                "Arraste a TelaInicial para o ControleDeCena.",
+                gameObject
+            );
+        }
+
+        if (telaCreditos == null)
+        {
+            Debug.LogWarning(
+                "Arraste a TelaCreditos para o ControleDeCena.",
                 gameObject
             );
         }
@@ -127,6 +159,14 @@ public class ControleDeCena : MonoBehaviour
         {
             Debug.LogWarning(
                 "Arraste o GameOverPanel para o ControleDeCena.",
+                gameObject
+            );
+        }
+
+        if (conteudoDoJogo == null)
+        {
+            Debug.LogWarning(
+                "Arraste o ConteudoDoJogo para o ControleDeCena.",
                 gameObject
             );
         }

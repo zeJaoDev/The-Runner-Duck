@@ -63,12 +63,12 @@ public class PlayerMove : MonoBehaviour
 
     private void Update()
     {
-        // Permite atirar mesmo preso na armadilha.
         VerificarTiro();
 
         if (IsFrozen ||
             saindoDaArmadilha ||
-            playerPhysics == null)
+            playerPhysics == null ||
+            Time.timeScale <= 0f)
         {
             return;
         }
@@ -104,8 +104,6 @@ public class PlayerMove : MonoBehaviour
 
         MostrarGameOver(pontosFinais);
 
-        // O jogador morreu, então o script
-        // pode ser desativado completamente.
         enabled = false;
 
         EsconderJogador();
@@ -133,9 +131,6 @@ public class PlayerMove : MonoBehaviour
             playerPhysics.constraints =
                 RigidbodyConstraints2D.FreezeAll;
         }
-
-        // O PlayerMove permanece ativo para
-        // permitir o tiro enquanto estiver preso.
     }
 
     public void Unfreeze()
@@ -259,8 +254,6 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
-        // Impede o tiro quando o mouse estiver
-        // sobre um botão ou elemento da interface.
         if (EventSystem.current != null &&
             EventSystem.current.IsPointerOverGameObject())
         {
@@ -372,6 +365,14 @@ public class PlayerMove : MonoBehaviour
 
     private void MostrarGameOver(int pontosFinais)
     {
+        MostrarPainelGameOver();
+        MostrarPontuacaoFinal(pontosFinais);
+        MostrarKillsFinais();
+        VerificarRecorde(pontosFinais);
+    }
+
+    private void MostrarPainelGameOver()
+    {
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
@@ -382,7 +383,11 @@ public class PlayerMove : MonoBehaviour
                 "O GameOverPanel não foi configurado!"
             );
         }
+    }
 
+    private void MostrarPontuacaoFinal(
+        int pontosFinais)
+    {
         if (pontuacaoFinal != null)
         {
             pontuacaoFinal.MostrarPontuacao(
@@ -393,6 +398,37 @@ public class PlayerMove : MonoBehaviour
         {
             Debug.LogWarning(
                 "O componente PontuacaoFinal não foi encontrado!"
+            );
+        }
+    }
+
+    private void MostrarKillsFinais()
+    {
+        if (ContadorKills.Instancia != null)
+        {
+            ContadorKills.Instancia
+                .MostrarKillsFinais();
+        }
+        else
+        {
+            Debug.LogWarning(
+                "O ContadorKills não foi encontrado!"
+            );
+        }
+    }
+
+    private void VerificarRecorde(
+        int pontosFinais)
+    {
+        if (SistemaDeRecorde.Instancia != null)
+        {
+            SistemaDeRecorde.Instancia
+                .VerificarRecorde(pontosFinais);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "O SistemaDeRecorde não foi encontrado!"
             );
         }
     }
