@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class PlayerMove : MonoBehaviour
@@ -17,8 +18,12 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private GameObject shotWaterPrefab;
     [SerializeField] private Transform firingPoint;
 
+    [Header("Pontuação")]
+    [SerializeField] private ContadorPontos contadorPontos;
+
     [Header("Game Over")]
     [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private PontuacaoFinal pontuacaoFinal;
 
     [Header("Escape da armadilha")]
     [SerializeField] private float velocidadeDeEscape = 8f;
@@ -36,16 +41,8 @@ public class PlayerMove : MonoBehaviour
 
     private void Awake()
     {
-        if (playerPhysics == null)
-        {
-            playerPhysics = GetComponent<Rigidbody2D>();
-        }
-
-        if (playerPhysics != null)
-        {
-            constraintsOriginais =
-                playerPhysics.constraints;
-        }
+        EncontrarComponentes();
+        SalvarRestricoesOriginais();
     }
 
     private void OnEnable()
@@ -66,8 +63,7 @@ public class PlayerMove : MonoBehaviour
 
     private void Update()
     {
-        // O tiro é verificado antes do bloqueio de movimento.
-        // Assim, o jogador consegue atirar mesmo preso.
+        // Permite atirar mesmo preso na armadilha.
         VerificarTiro();
 
         if (IsFrozen ||
@@ -80,6 +76,20 @@ public class PlayerMove : MonoBehaviour
         AtualizarMovimentacao();
     }
 
+    private void OnCollisionEnter2D(
+        Collision2D collision)
+    {
+        VerificarContatoComInimigo(
+            collision.collider
+        );
+    }
+
+    private void OnTriggerEnter2D(
+        Collider2D other)
+    {
+        VerificarContatoComInimigo(other);
+    }
+
     public void Morrer()
     {
         if (dead)
@@ -89,13 +99,13 @@ public class PlayerMove : MonoBehaviour
 
         dead = true;
 
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-        }
+        int pontosFinais =
+            FinalizarContadorDePontos();
 
-        // Aqui o script pode ser desativado,
-        // pois o jogador realmente morreu.
+        MostrarGameOver(pontosFinais);
+
+        // O jogador morreu, então o script
+        // pode ser desativado completamente.
         enabled = false;
 
         EsconderJogador();
@@ -115,14 +125,17 @@ public class PlayerMove : MonoBehaviour
 
         if (playerPhysics != null)
         {
-            playerPhysics.linearVelocity = Vector2.zero;
+            playerPhysics.linearVelocity =
+                Vector2.zero;
+
             playerPhysics.angularVelocity = 0f;
+
             playerPhysics.constraints =
                 RigidbodyConstraints2D.FreezeAll;
         }
 
-        // Não desativa o PlayerMove.
-        // O Update precisa continuar funcionando para atirar.
+        // O PlayerMove permanece ativo para
+        // permitir o tiro enquanto estiver preso.
     }
 
     public void Unfreeze()
@@ -174,7 +187,8 @@ public class PlayerMove : MonoBehaviour
         if (dead ||
             IsFrozen ||
             saindoDaArmadilha ||
-            playerPhysics == null)
+            playerPhysics == null ||
+            Time.timeScale <= 0f)
         {
             return;
         }
@@ -183,6 +197,40 @@ public class PlayerMove : MonoBehaviour
             playerDirection.x * playerSpeed,
             playerJumpHeight
         );
+    }
+
+    private void EncontrarComponentes()
+    {
+        if (playerPhysics == null)
+        {
+            playerPhysics =
+                GetComponent<Rigidbody2D>();
+        }
+
+        if (contadorPontos == null)
+        {
+            contadorPontos =
+                FindFirstObjectByType<ContadorPontos>();
+        }
+
+        if (pontuacaoFinal == null &&
+            gameOverPanel != null)
+        {
+            pontuacaoFinal =
+                gameOverPanel
+                    .GetComponentInChildren<PontuacaoFinal>(
+                        true
+                    );
+        }
+    }
+
+    private void SalvarRestricoesOriginais()
+    {
+        if (playerPhysics != null)
+        {
+            constraintsOriginais =
+                playerPhysics.constraints;
+        }
     }
 
     private void AtualizarMovimentacao()
@@ -204,7 +252,17 @@ public class PlayerMove : MonoBehaviour
 
     private void VerificarTiro()
     {
-        if (dead || saindoDaArmadilha)
+        if (dead ||
+            saindoDaArmadilha ||
+            Time.timeScale <= 0f)
+        {
+            return;
+        }
+
+        // Impede o tiro quando o mouse estiver
+        // sobre um botão ou elemento da interface.
+        if (EventSystem.current != null &&
+            EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }
@@ -228,6 +286,32 @@ public class PlayerMove : MonoBehaviour
             firingPoint.position,
             firingPoint.rotation
         );
+    }
+
+    private void VerificarContatoComInimigo(
+        Collider2D objetoTocado)
+    {
+        if (dead || objetoTocado == null)
+        {
+            return;
+        }
+
+        GameObject objeto =
+            objetoTocado.gameObject;
+
+        GameObject objetoPrincipal =
+            objetoTocado.transform.root.gameObject;
+
+        bool tocouInimigo =
+            objeto.CompareTag("Enemy") ||
+            objeto.CompareTag("Croc") ||
+            objetoPrincipal.CompareTag("Enemy") ||
+            objetoPrincipal.CompareTag("Croc");
+
+        if (tocouInimigo)
+        {
+            Morrer();
+        }
     }
 
     private IEnumerator SaidaAutomatica()
@@ -263,6 +347,54 @@ public class PlayerMove : MonoBehaviour
         }
 
         saindoDaArmadilha = false;
+    }
+
+    private int FinalizarContadorDePontos()
+    {
+        if (contadorPontos == null)
+        {
+            contadorPontos =
+                FindFirstObjectByType<ContadorPontos>();
+        }
+
+        if (contadorPontos != null)
+        {
+            return contadorPontos
+                .FinalizarPontuacao();
+        }
+
+        Debug.LogWarning(
+            "O ContadorPontos não foi encontrado!"
+        );
+
+        return 0;
+    }
+
+    private void MostrarGameOver(int pontosFinais)
+    {
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "O GameOverPanel não foi configurado!"
+            );
+        }
+
+        if (pontuacaoFinal != null)
+        {
+            pontuacaoFinal.MostrarPontuacao(
+                pontosFinais
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "O componente PontuacaoFinal não foi encontrado!"
+            );
+        }
     }
 
     private void EsconderJogador()
